@@ -47,8 +47,9 @@ python3 ladder.py
 ```
 
 That rewrites `stl/`. `tower.py` and `stack.py` are earlier designs that
-`ladder.py` borrows a few shapes from. `joinery-notes.md` is the research
-behind the joints.
+`ladder.py` borrows a few shapes from. The research behind the joints is in the
+skill:
+[`joinery-notes.md`](../skill/bambu-a1mini-print/references/joinery-notes.md).
 
 ## The print skill
 

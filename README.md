@@ -29,7 +29,8 @@ and PETG. For any other printer, slice the STLs yourself.
 [`skill/bambu-a1mini-print`](skill/bambu-a1mini-print) is the Claude Code skill
 these prints were made with: CAD helpers, a slicing script for the Bambu
 Studio command line, the procedure for sending a plate through Bambu Studio,
-and notes on what this printer and filament did (including the failures). It
+notes on what this printer and filament did (including the failures), and
+[research on joining printed parts](skill/bambu-a1mini-print/references/joinery-notes.md). It
 describes one specific setup, an A1 mini driven from a macOS virtual machine
 through the Bambu cloud, so treat it as an example to adapt. To use it, copy
 the folder to `~/.claude/skills/`.

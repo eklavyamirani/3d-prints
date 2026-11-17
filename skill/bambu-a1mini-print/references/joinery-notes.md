@@ -1,13 +1,17 @@
 # Joinery notes: joining printed parts, and going past the 180 mm bed
 
-Desk research from November 2026, done while designing a tablet rack
-(`~/repositories/3d-prints/tablet-rack`). Treat the numbers as other people's results;
-when a joint from this file gets printed, move what it taught into
-`design-notes.md`. Printed so far (2026-11-15): the rack's through tenon, round
-splice key and sleeve, for fit only; the fits are in `design-notes.md` under
-"Fit and tolerances". None of it has carried a load yet.
+General notes for any print that has to join, come apart or be longer than
+the bed. They are desk research from November 2026: treat the numbers as other
+people's results, and when a joint from this file gets printed, move what it
+taught into `design-notes.md`.
 
-## The three findings that changed the design
+The research was done for a tablet rack (`~/repositories/3d-prints/tablet-rack`),
+which is the worked example at the end. Printed and assembled so far
+(2026-11-16): that rack's through tenon, round splice key and sleeve. The fits
+are in `design-notes.md` under "Fit and tolerances". It holds four tablets; no
+joint has been load tested beyond that.
+
+## Three findings to start from
 
 1. **A joint never makes a member stronger; it lets you change the structure.**
    The rack's problem was long cantilevered arms. No joint fixes an arm, but a
@@ -81,7 +85,7 @@ Sources disagree on PLA versus PETG at room temperature and none had a
 controlled long-term sag test. Keep sustained stress low (the rack is under
 1 MPa) and prefer short reaches over deep sections.
 
-## What the tablet rack does with this
+## Worked example: the tablet rack
 
 `ladder.py`: two closed side frames with 40 mm ledges (housing-joint idea),
 tied by two flat rails that pass through windows in the feet (through tenons,
