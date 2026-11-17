@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D prints</title>
+<style>
+  :root {
+    --bg: #f6f5f2; --panel: #ffffff; --ink: #1d1d1f; --muted: #6b6b70;
+    --line: #e2e0da; --accent: #c2571a; --stage: #ecebe6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151517; --panel: #1e1e21; --ink: #ececee; --muted: #9a9aa0;
+      --line: #2e2e33; --accent: #f08a4b; --stage: #101012;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  a { color: var(--accent); }
+  header, main { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+  header { padding-top: 28px; padding-bottom: 8px; }
+  header h1 { margin: 0; font-size: 1.6rem; }
+  header h1 a { color: inherit; text-decoration: none; }
+  header p { margin: 4px 0 0; color: var(--muted); }
+  main { padding-bottom: 48px; }
+
+  .toc { list-style: none; padding: 0; margin: 20px 0 0; display: grid; gap: 16px;
+         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+  .card { display: block; background: var(--panel); border: 1px solid var(--line);
+          border-radius: 12px; overflow: hidden; color: inherit; text-decoration: none; }
+  .card:hover, .card:focus-visible { border-color: var(--accent); }
+  .card img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: #fff; }
+  .card div { padding: 12px 14px 14px; }
+  .card h2 { margin: 0 0 4px; font-size: 1.1rem; }
+  .card p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+
+  .back { display: inline-block; margin: 16px 0 4px; }
+  .print h2 { margin: 0; font-size: 1.4rem; }
+  .print > p { margin: 4px 0 0; color: var(--muted); }
+  .facts { list-style: none; padding: 0; margin: 10px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .facts li { border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; font-size: 0.85rem; }
+  .stage { position: relative; margin-top: 14px; background: var(--stage); border: 1px solid var(--line);
+           border-radius: 12px; overflow: hidden; height: min(68vh, 620px); min-height: 320px; }
+  .stage canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+  .status { position: absolute; left: 12px; bottom: 10px; color: var(--muted); font-size: 0.85rem; }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: center; }
+  button { font: inherit; font-size: 0.9rem; color: var(--ink); background: var(--panel);
+           border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .spacer { flex: 1; }
+  .hint { color: var(--muted); font-size: 0.85rem; margin-top: 8px; }
+</style>
+<script type="importmap">
+{ "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<header>
+  <h1><a href="#/">3D prints</a></h1>
+  <p>Designed in Python, printed in PETG on a Bambu Lab A1 mini.</p>
+</header>
+<main id="app"></main>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { STLLoader } from "three/addons/loaders/STLLoader.js";
+
+const REPO = "https://github.com/eklavyamirani/3d-prints/tree/main/";
+const app = document.getElementById("app");
+const prints = await fetch("prints.json").then(r => r.json());
+let viewer = null;
+
+const el = (tag, attrs = {}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) k === "text" ? n.textContent = v : n.setAttribute(k, v);
+  n.append(...kids);
+  return n;
+};
+
+function showContents() {
+  const list = el("ul", { class: "toc" });
+  for (const p of prints) {
+    list.append(el("li", {},
+      el("a", { class: "card", href: `#/${p.id}` },
+        el("img", { src: p.image, alt: `Render of the ${p.title.toLowerCase()}`, loading: "lazy" }),
+        el("div", {}, el("h2", { text: p.title }), el("p", { text: p.summary })))));
+  }
+  app.replaceChildren(list);
+}
+
+function showPrint(p) {
+  const canvas = el("canvas", { "aria-label": `Rotating 3D view of the ${p.title.toLowerCase()}` });
+  const status = el("div", { class: "status", text: "Loading model…" });
+  const viewBar = el("div", { class: "bar", role: "group", "aria-label": "What to show" });
+  const spin = el("button", { "aria-pressed": "true", text: "Rotate" });
+  const reset = el("button", { text: "Reset view" });
+  const facts = el("ul", { class: "facts" }, ...p.facts.map(f => el("li", { text: f })));
+  app.replaceChildren(
+    el("a", { class: "back", href: "#/", text: "← All prints" }),
+    el("section", { class: "print" },
+      el("h2", { text: p.title }), el("p", { text: p.summary }), facts,
+      el("div", { class: "stage" }, canvas, status),
+      viewBar,
+      el("div", { class: "bar" }, spin, reset, el("span", { class: "spacer" }),
+        el("a", { href: REPO + p.id, text: "Files and instructions on GitHub" })),
+      el("p", { class: "hint", text: "Drag to turn, scroll or pinch to zoom, right-drag to move." })));
+
+  viewer = makeViewer(canvas, status);
+  const buttons = p.views.map((v, i) => {
+    const b = el("button", { "aria-pressed": "false", text: v.name });
+    b.onclick = () => {
+      buttons.forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+      viewer.load(v.models);
+    };
+    viewBar.append(b);
+    return b;
+  });
+  buttons[0].click();
+  spin.onclick = () => {
+    const on = spin.getAttribute("aria-pressed") !== "true";
+    spin.setAttribute("aria-pressed", String(on));
+    viewer.controls.autoRotate = on;
+  };
+  reset.onclick = () => viewer.frame();
+}
+
+function makeViewer(canvas, status) {
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(35, 1, 1, 20000);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x777777, 1.6));
+  const key = new THREE.DirectionalLight(0xffffff, 2.2);
+  camera.add(key); key.position.set(1, 2, 1.5); scene.add(camera);   // light follows the camera
+
+  const controls = new OrbitControls(camera, canvas);
+  controls.enableDamping = true;
+  controls.autoRotate = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+  controls.autoRotateSpeed = 1.6;
+
+  const group = new THREE.Group();
+  group.rotation.x = -Math.PI / 2;            // the models are z-up
+  scene.add(group);
+  const loader = new STLLoader();
+  let radius = 100, token = 0, alive = true;
+
+  function frame() {
+    const d = radius / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.08;
+    camera.position.set(0.72, 0.42, 0.9).normalize().multiplyScalar(d);
+    controls.target.set(0, 0, 0);
+    controls.minDistance = d * 0.2; controls.maxDistance = d * 4;
+    controls.update();
+  }
+
+  async function load(models) {
+    const mine = ++token;
+    status.textContent = "Loading model…";
+    try {
+      const geos = await Promise.all(models.map(m => loader.loadAsync(m.stl)));
+      if (mine !== token || !alive) return;
+      for (const c of [...group.children]) { c.geometry.dispose(); c.material.dispose(); group.remove(c); }
+      geos.forEach((g, i) => {
+        g.computeVertexNormals();
+        group.add(new THREE.Mesh(g, new THREE.MeshStandardMaterial({
+          color: models[i].color, roughness: 0.65, metalness: 0.05, flatShading: true })));
+      });
+      group.position.set(0, 0, 0);
+      const box = new THREE.Box3().setFromObject(group);
+      const c = box.getCenter(new THREE.Vector3());
+      group.position.sub(c);
+      radius = box.getSize(new THREE.Vector3()).length() / 2;
+      const s = box.getSize(new THREE.Vector3());
+      status.textContent = `${Math.round(s.x)} × ${Math.round(s.z)} × ${Math.round(s.y)} mm`;
+      frame();
+    } catch (e) {
+      if (mine === token) status.textContent = "Could not load the model.";
+      console.error(e);
+    }
+  }
+
+  function tick() {
+    if (!alive) return;
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    if (canvas.width !== Math.round(w * renderer.getPixelRatio()) || canvas.height !== Math.round(h * renderer.getPixelRatio())) {
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h; camera.updateProjectionMatrix();
+    }
+    controls.update();
+    renderer.render(scene, camera);
+    requestAnimationFrame(tick);
+  }
+  tick();
+  return { controls, load, frame, dispose() { alive = false; controls.dispose(); renderer.dispose(); } };
+}
+
+function route() {
+  if (viewer) { viewer.dispose(); viewer = null; }
+  const id = location.hash.replace(/^#\/?/, "");
+  const p = prints.find(x => x.id === id);
+  document.title = p ? `${p.title} · 3D prints` : "3D prints";
+  p ? showPrint(p) : showContents();
+  scrollTo(0, 0);
+}
+addEventListener("hashchange", route);
+route();
+</script>
+</body>
+</html>

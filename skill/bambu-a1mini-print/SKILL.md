@@ -49,7 +49,9 @@ STLs in the project folder so a reprint is one edit away.
 Prints live in `~/repositories/3d-prints` (public on GitHub), one directory per
 print: the model script, `stl/`, `sliced/` (only the `.gcode.3mf` files), a
 README, and `final.png`, a render of the finished product. Add a new print as a
-new directory there and list it in the root README. `skill/` in that repository
+new directory there, list it in the root README, and add an entry to
+`prints.json`: that file drives the GitHub Pages viewer (`index.html`), which
+shows each listed STL as a rotating 3D model, so include an assembled STL. `skill/` in that repository
 is a copy of this skill: after editing the skill, copy it over and commit. The
 repository is public, so keep account details, serial numbers, screenshots of
 the desktop and local paths out of it.

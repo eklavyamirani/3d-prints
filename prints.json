@@ -1,0 +1,39 @@
+[
+  {
+    "id": "tablet-rack",
+    "title": "Tablet rack",
+    "summary": "Holds four tablets lying flat, one above another. Two sides and two spliced rails, no glue or screws.",
+    "facts": ["247 x 150 x 93 mm", "PETG, about 300 g", "3 plates, 7.5 h"],
+    "image": "tablet-rack/final.png",
+    "views": [
+      {
+        "name": "In use",
+        "models": [
+          { "stl": "tablet-rack/previews/mock_rack.stl", "color": "#d2691e" },
+          { "stl": "tablet-rack/previews/mock_ipad-pro-12.9-m1.stl", "color": "#8a8f98" },
+          { "stl": "tablet-rack/previews/mock_ipad-pro-13-m4.stl", "color": "#8a8f98" },
+          { "stl": "tablet-rack/previews/mock_kindle-scribe.stl", "color": "#3f6b5c" },
+          { "stl": "tablet-rack/previews/mock_ipad-mini-6.stl", "color": "#6d5f8f" }
+        ]
+      },
+      { "name": "Empty", "models": [{ "stl": "tablet-rack/previews/mock_rack.stl", "color": "#d2691e" }] },
+      { "name": "Side, as printed", "models": [{ "stl": "tablet-rack/stl/side.stl", "color": "#d2691e" }] },
+      { "name": "Rail half with key", "models": [{ "stl": "tablet-rack/stl/rail_half_key.stl", "color": "#d2691e" }] },
+      { "name": "Rail half with socket", "models": [{ "stl": "tablet-rack/stl/rail_half_socket.stl", "color": "#d2691e" }] },
+      { "name": "Sleeve", "models": [{ "stl": "tablet-rack/stl/sleeve.stl", "color": "#d2691e" }] }
+    ]
+  },
+  {
+    "id": "flair-splash-guard",
+    "title": "Flair 58 splash guard",
+    "summary": "Seven interlocking wall panels that stand in a half sheet pan around a Flair 58 espresso press.",
+    "facts": ["381 x 254 mm inside, 170 mm tall", "PETG, about 960 g", "7 plates, 24 h"],
+    "image": "flair-splash-guard/final.png",
+    "views": [
+      { "name": "Assembled", "models": [{ "stl": "flair-splash-guard/assembly.stl", "color": "#c8963c" }] },
+      { "name": "Straight panel", "models": [{ "stl": "flair-splash-guard/stl/panel_straight.stl", "color": "#c8963c" }] },
+      { "name": "Cable panel", "models": [{ "stl": "flair-splash-guard/stl/panel_straight_cable.stl", "color": "#c8963c" }] },
+      { "name": "Corner panel", "models": [{ "stl": "flair-splash-guard/stl/panel_corner.stl", "color": "#c8963c" }] }
+    ]
+  }
+]

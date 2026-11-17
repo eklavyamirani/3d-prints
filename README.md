@@ -4,6 +4,8 @@ Things designed in Python and printed in PETG on a Bambu Lab A1 mini. Each
 print has its own directory with the model script, the STLs, the sliced plates
 and `final.png`, a render of the finished product.
 
+**See them in 3D: https://eklavyamirani.github.io/3d-prints/**
+
 | Print | What it is | |
 |---|---|---|
 | [tablet-rack](tablet-rack) | A rack that holds four tablets lying flat, one above another. Two sides and two spliced rails, no glue or screws. | <img src="tablet-rack/final.png" width="320"> |
@@ -20,6 +22,9 @@ and `final.png`, a render of the finished product.
   sliced/        .gcode.3mf plates for the A1 mini
   previews/      other renders
 ```
+
+`index.html` is the viewer behind the link above. It reads `prints.json`, so a
+new print shows up there once it has an entry listing its STLs.
 
 The sliced files are for an A1 mini with a 0.4 mm nozzle, a textured PEI plate
 and PETG. For any other printer, slice the STLs yourself.
