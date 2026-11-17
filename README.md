@@ -4,7 +4,7 @@ Things designed in Python and printed in PETG on a Bambu Lab A1 mini. Each
 print has its own directory with the model script, the STLs, the sliced plates
 and `final.png`, a render of the finished product.
 
-**See them in 3D: https://eklavyamirani.github.io/3d-prints/**
+**See them in 3D: https://github.ekkylab.uk/3d-prints/**
 
 | Print | What it is | |
 |---|---|---|
